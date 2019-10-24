@@ -18,7 +18,7 @@ RUN curl -L https://get.helm.sh/${FILENAME} > ${FILENAME} && \
 FROM alpine:3.9
 WORKDIR /src
 
-RUN apk add --update --no-cache ca-certificates
+RUN apk add --update --no-cache ca-certificates curl bash
 
 COPY --from=build /tmp/linux-amd64/helm /bin/helm
 COPY --from=minio/mc /usr/bin/mc /bin/mc
