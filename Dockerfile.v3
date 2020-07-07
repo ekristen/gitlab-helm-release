@@ -1,0 +1,24 @@
+FROM alpine:3.9 as build
+WORKDIR /
+
+RUN apk add --update --no-cache ca-certificates git
+
+ENV VERSION=v3.2.4
+ENV FILENAME=helm-${VERSION}-linux-amd64.tar.gz
+ENV SHA256SUM=8eb56cbb7d0da6b73cd8884c6607982d0be8087027b8ded01d6b2759a72e34b1
+
+RUN apk add --update -t deps curl tar gzip
+RUN curl -L https://get.helm.sh/${FILENAME} > ${FILENAME} && \
+    echo "${SHA256SUM}  ${FILENAME}" > helm_${VERSION}_SHA256SUMS && \
+    sha256sum -cs helm_${VERSION}_SHA256SUMS && \
+    tar zxv -C /tmp -f ${FILENAME} && \
+    rm -f ${FILENAME}
+
+# The image we keep
+FROM alpine:3.9
+WORKDIR /src
+
+RUN apk add --update --no-cache ca-certificates
+
+COPY --from=build /tmp/linux-amd64/helm /bin/helm
+COPY --from=minio/mc /usr/bin/mc /bin/mc
