@@ -1,11 +1,11 @@
-FROM alpine:3.9 as build
+FROM alpine:3.11 as build
 WORKDIR /
 
 RUN apk add --update --no-cache ca-certificates git
 
-ENV VERSION=v3.2.4
+ENV VERSION=v3.3.4
 ENV FILENAME=helm-${VERSION}-linux-amd64.tar.gz
-ENV SHA256SUM=8eb56cbb7d0da6b73cd8884c6607982d0be8087027b8ded01d6b2759a72e34b1
+ENV SHA256SUM=b664632683c36446deeb85c406871590d879491e3de18978b426769e43a1e82c
 
 RUN apk add --update -t deps curl tar gzip
 RUN curl -L https://get.helm.sh/${FILENAME} > ${FILENAME} && \
@@ -15,10 +15,10 @@ RUN curl -L https://get.helm.sh/${FILENAME} > ${FILENAME} && \
     rm -f ${FILENAME}
 
 # The image we keep
-FROM alpine:3.9
+FROM alpine:3.11
 WORKDIR /src
 
-RUN apk add --update --no-cache ca-certificates
+RUN apk add --update --no-cache ca-certificates bash perl-utils
 
 COPY --from=build /tmp/linux-amd64/helm /bin/helm
 COPY --from=minio/mc /usr/bin/mc /bin/mc
